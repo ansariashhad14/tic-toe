@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Tic-Tac-Toe</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .turn-indicator {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .main {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            background-color: #444;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .btn {
+            width: 80px;
+            height: 80px;
+            background-color: #61dafb;
+            border: none;
+            font-size: 30px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .btn.x { color: red; }
+        .btn.o { color: blue; }
+        .btn.winning { background-color: white !important; }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .control-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .restart {
+            background-color: #dc3545;
+            color: white;
+        }
+        .restart:hover {
+            background-color: #c82333;
+        }
+        .player-inputs {
+            margin-bottom: 15px;
+        }
+        .player-inputs input {
+            padding: 5px;
+            margin: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enhanced Tic-Tac-Toe</h1>
+    <div class="player-inputs">
+        <input type="text" id="playerX" placeholder="Enter Player X Name">
+        <input type="text" id="playerO" placeholder="Enter Player O Name">
+        <button id="startGame">Start Game</button>
+    </div>
+    <div class="turn-indicator" id="turnIndicator">Enter player names to start!</div>
+    <div class="main" id="board" style="display: none;">
+        <button class="btn" data-index="0"></button>
+        <button class="btn" data-index="1"></button>
+        <button class="btn" data-index="2"></button>
+        <button class="btn" data-index="3"></button>
+        <button class="btn" data-index="4"></button>
+        <button class="btn" data-index="5"></button>
+        <button class="btn" data-index="6"></button>
+        <button class="btn" data-index="7"></button>
+        <button class="btn" data-index="8"></button>
+    </div>
+    
+    <div class="controls">
+        <button class="control-btn restart" id="restartBtn" style="display: none;">Restart</button>
+    </div>
+
+    <script>
+        let buttons = document.querySelectorAll(".btn");
+        let turnIndicator = document.getElementById("turnIndicator");
+        let restartBtn = document.getElementById("restartBtn");
+        let startGameBtn = document.getElementById("startGame");
+        let playerXInput = document.getElementById("playerX");
+        let playerOInput = document.getElementById("playerO");
+        let board = document.getElementById("board");
+        
+        let playerX = "Player X";
+        let playerO = "Player O";
+        let currentPlayer = "X";
+        let gameOver = false;
+
+        startGameBtn.onclick = function() {
+            playerX = playerXInput.value || "Player X";
+            playerO = playerOInput.value || "Player O";
+            turnIndicator.innerText = `${playerX}'s Turn`;
+            board.style.display = "grid";
+            restartBtn.style.display = "block";
+        };
+        
+        function checkWinner() {
+            let values = Array.from(buttons).map(btn => btn.innerText);
+            let winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+                [0, 4, 8], [2, 4, 6]
+            ];
+            
+            for (let combo of winningCombinations) {
+                let [a, b, c] = combo;
+                if (values[a] && values[a] === values[b] && values[a] === values[c]) {
+                    gameOver = true;
+                    buttons[a].classList.add("winning");
+                    buttons[b].classList.add("winning");
+                    buttons[c].classList.add("winning");
+                    let winnerName = (values[a] === "X") ? playerX : playerO;
+                    turnIndicator.innerText = `${winnerName} Wins!`;
+                    return;
+                }
+            }
+            
+            if (!values.includes("")) {
+                turnIndicator.innerText = "It's a Draw!";
+                gameOver = true;
+            }
+        }
+        
+        buttons.forEach(button => {
+            button.onclick = function() {
+                if (!this.innerText && !gameOver) {
+                    this.innerText = currentPlayer;
+                    this.classList.add(currentPlayer.toLowerCase());
+                    checkWinner();
+                    if (!gameOver) {
+                        currentPlayer = (currentPlayer === "X") ? "O" : "X";
+                        turnIndicator.innerText = (currentPlayer === "X") ? `${playerX}'s Turn` : `${playerO}'s Turn`;
+                    }
+                }
+            };
+        });
+        
+        restartBtn.onclick = function() {
+            buttons.forEach(button => {
+                button.innerText = "";
+                button.classList.remove("x", "o", "winning");
+            });
+            currentPlayer = "X";
+            gameOver = false;
+            turnIndicator.innerText = `${playerX}'s Turn`;
+        };
+    </script>
+</body>
+</html>
